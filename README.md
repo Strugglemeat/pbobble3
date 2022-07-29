@@ -1,5 +1,4 @@
-# pbobble3
-Puzzle Bobble 3 Recarbonated mod
+# Puzzle Bobble 3 Recarbonated mod
 
 changes:
 * Button 2 does a 1px 'nudge' to the left (with sound)
