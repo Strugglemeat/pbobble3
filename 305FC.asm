@@ -87,17 +87,16 @@ TurnGuideOffP2:
 	andi.b #$7F,$41F837 ;turn off the guide
 
 HoldDownExchangeP1:
-	cmpi.b #$08,$4134B7 ;after they swap, set 4134B7 to FF, if it's FF, don't allow any of this. set 4134B7 to 00 after shot fired - FF not working properly, since cmpi uses it as -1 (this is the first byte of the word of the counter)
+	cmpi.b #$08,$4134B7 ;after they swap, set 4134B7 to 08, if it's 08, don't allow any of this. set 4134B7 to 00 after shot fired (should be after let go of down)
 	beq P1TimerCheckDown ;we need to be able to reset it if the player just shot, so don't just skip past to Player 2
 	cmpi.b #02,$407954 ;P1 input - is down held?
 	bne TurnOffP1Down
-	;cmpi.b $413421,$413412 ;add a check for whether the preview and current are the same
-	;beq HoldDownExchangeP2 ;if so, leave
+	;add a check for whether the preview and current are the same
 	addi.w #01,$4134B7 ;p1 held down accumulator
 	addi.b #01,$4134B9 ;cursor angle counter thingie
-	cmpi.b #$08,$4134B9 ;is it halfway?
+	cmpi.b #$08,$4134B9 ;code related to cursor shaking - is it halfway?
 	bgt OscillatorSubP1
-	addi.b #01,$413420 ;add 1 to p1 cursor angle
+	addi.b #01,$413420 ;add 1 to p1 cursor angle (shaking)
 	cmpi.b #$3C,$10(A0) ;are we at the far right maximum
 	ble.b P1TimerCheckDown ;if it's less than or equal to 3C, leave
 	move.b #$3C,$10(A0) ;if it was greater than 3C, we move 3C in there
@@ -112,7 +111,7 @@ OscillatorSubP1:
 CheckOscP1:
 	cmpi.b #$10,$4134B9 ;is it full way?
 	bne P1TimerCheckDown
-	move.b #00,$4134B9
+	move.b #00,$4134B9 ;reset oscillator
 
 P1TimerCheckDown:
 	cmpi.w #$0004,$413464
