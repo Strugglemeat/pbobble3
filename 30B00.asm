@@ -1,21 +1,19 @@
 ;coming from B0556
 
 LeftDoubleTapBeginP1:
-	move.l #$413410,A5 ;first we need to see which player we are
-	cmp.l A0,A5 ;is A0 413410 ? P1
+	;cmpa.l $413410,A0 ;are we P1 or P2?
+	;cmpa.w $3410,A0 ;are we P1 or P2?
+	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne LeftDoubleTapBeginP2
-	move.l #$407954,A5
-	cmpi.b #04,(A5) ;is P1 non-unified holding LEFT?
+	cmpi.b #04,(-$6AC,A5) ;is P1 non-unified holding LEFT?
 	bne NotHoldingLeft
 	jmp LeftDoubleTapBeginBoth
 
 LeftDoubleTapBeginP2:
-	move.l #$407958,A5
-	cmpi.b #04,(A5) ;is P2 non-unified holding LEFT?
+	cmpi.b #04,(-$6A8,A5) ;is P2 non-unified holding LEFT?
 	bne NotHoldingLeft
 
 LeftDoubleTapBeginBoth:
-	move.l #$408000,A5 ;reset A5
 	cmpi.b #00,$AF(A0) ;are we within the timer window to double tap LEFT?
 	beq FirstLeftTap ;if the timer window is zero, this was our first tap Left
 	cmpi.b #01,$B0(A0) ;have we let go of left? (this is 00 if we have)
@@ -26,13 +24,12 @@ LeftDoubleTapBeginBoth:
 	jmp OriginalCode
 
 FirstLeftTap:
-	move.b #$14,$AF(A0) ;move 20 frame timer window for double tap LEFT
+	move.b #20,$AF(A0) ;move 20 frame timer window for double tap LEFT
 	move.b #01,$B0(A0) ;flag that says we are pressing LEFT currently
 	jmp OriginalCode
 
 NotHoldingLeft:
 	move.b #00,$B0(A0) ;flag that says we are NOT pressing LEFT currently
-	move.l #$408000,A5 ;reset A5
 
 SubLeftTimer:
 	cmpi.b #00,$AF(A0) ;is the timer window at zero?
@@ -40,21 +37,19 @@ SubLeftTimer:
 	subi.b #01,$AF(A0) ;subtract 1 from the timer window
 
 RightDoubleTapBeginP1:
-	move.l #$413410,A5 ;first we need to see which player we are
-	cmp.l A0,A5 ;is A0 413410 ? P1
+	;cmpa.l $413410,A0
+	;cmpa.w $3410,A0 ;are we P1 or P2?
+	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne RightDoubleTapBeginP2
-	move.l #$407954,A5
-	cmpi.b #08,(A5) ;is P1 non-unified holding RIGHT?
+	cmpi.b #08,(-$6AC,A5) ;is P1 non-unified holding RIGHT?
 	bne NotHoldingRight
 	jmp RightDoubleTapBeginBoth
 
 RightDoubleTapBeginP2:
-	move.l #$407958,A5
-	cmpi.b #08,(A5) ;is P2 non-unified holding RIGHT?
+	cmpi.b #08,(-$6A8,A5) ;is P2 non-unified holding RIGHT?
 	bne NotHoldingRight
 
 RightDoubleTapBeginBoth:
-	move.l #$408000,A5 ;reset A5
 	cmpi.b #00,$B1(A0) ;are we within the timer window to double tap RIGHT?
 	beq FirstRightTap ;if the timer window is zero, this was our first tap RIGHT
 	cmpi.b #01,$B2(A0) ;have we let go of RIGHT? (this is 00 if we have)
@@ -65,13 +60,12 @@ RightDoubleTapBeginBoth:
 	jmp OriginalCode
 
 FirstRightTap:
-	move.b #$14,$B1(A0) ;move 20 frame timer window for double tap RIGHT
+	move.b #20,$B1(A0) ;move 20 frame timer window for double tap RIGHT
 	move.b #01,$B2(A0) ;flag that says we are pressing RIGHT currently
 	jmp OriginalCode
 
 NotHoldingRight:
 	move.b #00,$B2(A0) ;flag that says we are NOT pressing RIGHT currently
-	move.l #$408000,A5 ;reset A5
 
 SubRightTimer:
 	cmpi.b #00,$B1(A0) ;is the timer window at zero?

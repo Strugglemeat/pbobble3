@@ -31,21 +31,19 @@ AllowNudgeNextTime:
 	subi.b #1,$A4(A0) ;subtract 1 from nudge delay byte
 
 DoubleTapUp:
-	move.l #$413410,A5 ;first we need to see which player we are
-	cmp.l A0,A5 ;is A0 413410 ? P1
+	;cmpa.l $413410,A0
+	;cmpa.w $3410,A0 ;are we P1 or P2?
+	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne DoubleTapUpCheckP2
-	move.l #$407954,A5
-	cmpi.b #01,(A5) ;is P1 non-unified holding UP?
+	cmpi.b #01,(-$6AC,A5) ;is P1 non-unified holding UP?
 	bne NotHoldingUp
 	jmp DoubleTapUpStart
 
 DoubleTapUpCheckP2:
-	move.l #$407958,A5
-	cmpi.b #01,(A5) ;is P2 non-unified holding up?
+	cmpi.b #01,(-$6A8,A5) ;is P2 non-unified holding up?
 	bne NotHoldingUp
 
 DoubleTapUpStart:
-	move.l #$408000,A5 ;reset A5
 	cmpi.b #00,$A5(A0) ;are we within the timer window to double tap UP?
 	beq FirstUpTap ;if the timer window is zero, this was our first tap UP
 	cmpi.b #01,$A6(A0) ;have we let go of up? (this is 00 if we have)
@@ -56,13 +54,12 @@ DoubleTapUpStart:
 	jmp SetGuideOnP1; jmp OriginalCode
 
 FirstUpTap:
-	move.b #$14,$A5(A0) ;move 20 frame timer window for double tap UP
+	move.b #20,$A5(A0) ;move 20 frame timer window for double tap UP
 	move.b #01,$A6(A0) ;flag that says we are pressing UP currently
 	jmp SetGuideOnP1; jmp OriginalCode
 
 NotHoldingUp:
 	move.b #00,$A6(A0) ;flag that says we are NOT pressing UP currently
-	move.l #$408000,A5 ;reset A5
 
 SubUpTimer:
 	cmpi.b #00,$A5(A0) ;is the timer window at zero?
@@ -120,7 +117,7 @@ P1TimerCheckDown:
 	jmp HoldDownExchangeP2
 	
 P1HeldDownCheckTimer:
-	cmpi.w #$BB,$4134B7 ;is P1 helddown enough time?
+	cmpi.w #$100,$4134B7 ;is P1 helddown enough time?
 	beq SwitchP1
 	jmp HoldDownExchangeP2
 
@@ -169,7 +166,7 @@ P2TimerCheckDown:
 	jmp PlaySound
 	
 P2HeldDownCheckTimer:
-	cmpi.w #$BB,$4134BC ;is P2 helddown enough time?
+	cmpi.w #$100,$4134BC ;is P2 helddown enough time?
 	beq SwitchP2
 	jmp PlaySound
 
