@@ -8,3 +8,8 @@ changes:
 * Double tap RIGHT to send cursor to far right (with sound)
 * Hold DOWN to swap between current piece and preview piece (with sound)
 * Aiming guide will become visible when the shot timer warning is displayed
+
+other changes which aren't reflected in these ASM files:
+* coins not subtracted upon use
+* automatically enter 2P vs mode
+* character select timer increased
