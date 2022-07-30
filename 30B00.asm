@@ -3,7 +3,7 @@
 LeftDoubleTapBeginP1:
 	move.l #$413410,A5 ;first we need to see which player we are
 	cmp.l A0,A5 ;is A0 413410 ? P1
-	bne LeftDoubleTapBeginP2:
+	bne LeftDoubleTapBeginP2
 	move.l #$407954,A5
 	cmpi.b #04,(A5) ;is P1 non-unified holding LEFT?
 	bne NotHoldingLeft
@@ -26,7 +26,7 @@ LeftDoubleTapBeginBoth:
 	jmp OriginalCode
 
 FirstLeftTap:
-	move.b #09,$AF(A0) ;move 8 frame timer window for double tap LEFT
+	move.b #$14,$AF(A0) ;move 20 frame timer window for double tap LEFT
 	move.b #01,$B0(A0) ;flag that says we are pressing LEFT currently
 	jmp OriginalCode
 
@@ -42,7 +42,7 @@ SubLeftTimer:
 RightDoubleTapBeginP1:
 	move.l #$413410,A5 ;first we need to see which player we are
 	cmp.l A0,A5 ;is A0 413410 ? P1
-	bne RightDoubleTapBeginP2:
+	bne RightDoubleTapBeginP2
 	move.l #$407954,A5
 	cmpi.b #08,(A5) ;is P1 non-unified holding RIGHT?
 	bne NotHoldingRight
@@ -65,7 +65,7 @@ RightDoubleTapBeginBoth:
 	jmp OriginalCode
 
 FirstRightTap:
-	move.b #09,$B1(A0) ;move 8 frame timer window for double tap RIGHT
+	move.b #$14,$B1(A0) ;move 20 frame timer window for double tap RIGHT
 	move.b #01,$B2(A0) ;flag that says we are pressing RIGHT currently
 	jmp OriginalCode
 

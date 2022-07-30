@@ -56,7 +56,7 @@ DoubleTapUpStart:
 	jmp SetGuideOnP1; jmp OriginalCode
 
 FirstUpTap:
-	move.b #09,$A5(A0) ;move 8 frame timer window for double tap UP
+	move.b #$14,$A5(A0) ;move 20 frame timer window for double tap UP
 	move.b #01,$A6(A0) ;flag that says we are pressing UP currently
 	jmp SetGuideOnP1; jmp OriginalCode
 
@@ -120,7 +120,7 @@ P1TimerCheckDown:
 	jmp HoldDownExchangeP2
 	
 P1HeldDownCheckTimer:
-	cmpi.w #$199,$4134B7 ;is P1 helddown enough time?
+	cmpi.w #$BB,$4134B7 ;is P1 helddown enough time?
 	beq SwitchP1
 	jmp HoldDownExchangeP2
 
@@ -169,7 +169,7 @@ P2TimerCheckDown:
 	jmp PlaySound
 	
 P2HeldDownCheckTimer:
-	cmpi.w #$199,$4134BC ;is P2 helddown enough time?
+	cmpi.w #$BB,$4134BC ;is P2 helddown enough time?
 	beq SwitchP2
 	jmp PlaySound
 
