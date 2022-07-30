@@ -6,55 +6,57 @@ NudgeAllowedCheck:
 	;if nudge check was 00, proceed down to permitting nudge
 
 NudgeLeft:
-	cmpi.b     #$20,$41f831.l
+	cmpi.b #$20,$41f831.l
 	bne NudgeRight ;if we aren't pressing button 2, let's go check to see if we are pressing btn 3
+	cmpi.b #$C4,$10(A0) ;are we at the far left maximum
+	beq SetGuideOnP1 ;we are at the far left max, so let's leave
 	subi.b #$1,$10(A0) ;subtract 1 from cursor position
 	move.w #$001B,$4134BA ; SOUND - NUDGE LEFT
 	move.b #30,$A4(A0) ;set the nudge delay byte to 30
-	cmpi.b #$C4,$10(A0) ;are we at the far left maximum
-	bge.b DoubleTapUp ;if we are greater than or equal to C4, we leave
-	move.b #$C4,$10(A0) ;if it was less than C4, we move C4 in there
-	bra DoubleTapUp ;we did our nudge, let's now leave (no further actions)
+	;bge.b SetGuideOnP1 ;if we are greater than or equal to C4, we leave
+	;move.b #$C4,$10(A0) ;if it was less than C4, we move C4 in there
+	bra SetGuideOnP1 ;we did our nudge, let's now leave (no further actions)
 
 NudgeRight:
 	cmpi.b     #$40,$41f831.l
 	bne DoubleTapUp ;let's move on to trying the next event thing
+	cmpi.b #$3C,$10(A0) ;are we at the far right maximum
+	beq SetGuideOnP1 ;we are at the far right, let's leave
 	addi.b #$1,$10(A0)
 	move.w #$001B,$4134BA ; SOUND - NUDGE RIGHT
 	move.b #30,$A4(A0) ;set the nudge byte to 30
-	cmpi.b #$3C,$10(A0) ;are we at the far right maximum
-	ble.b DoubleTapUp ;if it's less than or equal to 3C, leave
-	move.b #$3C,$10(A0) ;if it was greater than 3C, we move 3C in there ;we did our nudge, let's now leave (no further actions)
-	bra DoubleTapUp ;we did our nudge, let's now leave (no further actions)
+	;ble.b SetGuideOnP1 ;if it's less than or equal to 3C, leave
+	;move.b #$3C,$10(A0) ;if it was greater than 3C, we move 3C in there ;we did our nudge, let's now leave (no further actions)
+	bra SetGuideOnP1 ;we did our nudge, let's now leave (no further actions)
 
 AllowNudgeNextTime:
 	subi.b #1,$A4(A0) ;subtract 1 from nudge delay byte
 
 DoubleTapUp:
-	;cmpa.l $413410,A0
-	;cmpa.w $3410,A0 ;are we P1 or P2?
 	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne DoubleTapUpCheckP2
-	cmpi.b #01,(-$6AC,A5) ;is P1 non-unified holding UP?
+	cmpi.b #01,(-$6AC,A5) ;is P1 non-unified holding UP? (DO NOT SET THIS TO CMPI.B #00 - we need 01 as the input for up)
 	bne NotHoldingUp
 	jmp DoubleTapUpStart
 
 DoubleTapUpCheckP2:
-	cmpi.b #01,(-$6A8,A5) ;is P2 non-unified holding up?
+	cmpi.b #01,(-$6A8,A5) ;is P2 non-unified holding up? (DO NOT SET THIS TO CMPI.B #00 - we need 01 as the input for up)
 	bne NotHoldingUp
 
 DoubleTapUpStart:
 	cmpi.b #00,$A5(A0) ;are we within the timer window to double tap UP?
 	beq FirstUpTap ;if the timer window is zero, this was our first tap UP
-	cmpi.b #01,$A6(A0) ;have we let go of up? (this is 00 if we have)
-	beq SubUpTimer
+	cmpi.b #00,$A6(A0) ;have we let go of up? (this is 00 if we have)
+	bne SubUpTimer
+	move.b #00,$A5(A0) ;reset the timer window
+	cmpi.b #00,$10(A0) ;are we already at up?
+	beq SetGuideOnP1 ;if we're already at up, don't need to do double tap, leave
 	move.b #00,$10(A0) ;set our cursor to 00 (pointing up)
 	move.w #$0007,$4134BA ; SOUND - DOUBLE TAP UP
-	move.b #00,$A5(A0) ;reset the timer window
 	jmp SetGuideOnP1; jmp OriginalCode
 
 FirstUpTap:
-	move.b #20,$A5(A0) ;move 20 frame timer window for double tap UP
+	move.b #10,$A5(A0) ;move 10 frame timer window for double tap UP
 	move.b #01,$A6(A0) ;flag that says we are pressing UP currently
 	jmp SetGuideOnP1; jmp OriginalCode
 
@@ -89,9 +91,11 @@ HoldDownExchangeP1:
 	beq P1TimerCheckDown ;we need to be able to reset it if the player just shot, so don't just skip past to Player 2
 	cmpi.b #02,$407954 ;P1 input - is down held?
 	bne TurnOffP1Down
+	;cmpi.b $413421,$413412 ;add a check for whether the preview and current are the same
+	;beq HoldDownExchangeP2 ;if so, leave
 	addi.w #01,$4134B7 ;p1 held down accumulator
 	addi.b #01,$4134B9 ;cursor angle counter thingie
-	cmpi.b #$0B,$4134B9
+	cmpi.b #$08,$4134B9 ;is it halfway?
 	bgt OscillatorSubP1
 	addi.b #01,$413420 ;add 1 to p1 cursor angle
 	cmpi.b #$3C,$10(A0) ;are we at the far right maximum
@@ -106,7 +110,7 @@ OscillatorSubP1:
 	bge.b CheckOscP1 ;if we are greater than or equal to C4, we leave
 	move.b #$C4,$10(A0) ;if it was less than C4, we move C4 in there
 CheckOscP1:
-	cmpi.b #$16,$4134B9
+	cmpi.b #$10,$4134B9 ;is it full way?
 	bne P1TimerCheckDown
 	move.b #00,$4134B9
 
@@ -138,6 +142,8 @@ HoldDownExchangeP2:
 	beq P2TimerCheckDown ;we need to be able to reset it if the player just shot
 	cmpi.b #02,$407958 ;P2 input - is down held?
 	bne TurnOffP2Down
+	;cmpi.l $413521,$2(A0) ;are preview and current same for P2?
+	;beq PlaySound ;if so, leave
 	addi.w #01,$4134BC ;P2 held down accumulator
 	addi.b #01,$4134BE;cursor angle counter thingie
 	cmpi.b #$0B,$4134BE
