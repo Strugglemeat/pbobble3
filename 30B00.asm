@@ -1,5 +1,8 @@
 ;coming from B0556
 
+	cmpi.b #02,$41f773;sanity check to make sure game is going on
+	bne OriginalCode
+
 LeftDoubleTapBeginP1:
 	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne LeftDoubleTapBeginP2
@@ -25,7 +28,7 @@ DoLeftDoubleTapMove:
 	jmp OriginalCode
 
 FirstLeftTap:
-	move.b #10,$AF(A0) ;move 10 frame timer window for double tap LEFT
+	move.b #8,$AF(A0) ;move 8 frame timer window for double tap LEFT
 	move.b #01,$B0(A0) ;flag that says we are pressing LEFT currently
 	jmp OriginalCode
 
@@ -62,7 +65,7 @@ DoRightDoubleTapMove:
 	jmp OriginalCode
 
 FirstRightTap:
-	move.b #10,$B1(A0) ;move 10 frame timer window for double tap RIGHT
+	move.b #8,$B1(A0) ;move 8 frame timer window for double tap RIGHT
 	move.b #01,$B2(A0) ;flag that says we are pressing RIGHT currently
 	jmp OriginalCode
 

@@ -1,5 +1,8 @@
 ;coming from B056E, we are now at 305FC
 
+	cmpi.b #02,$41f773;sanity check to make sure game is going on
+	bne OriginalCodeB056E
+
 NudgeAllowedCheck:
 	cmpi.b #00,$A4(A0) ;is the nudge check 00? if not, leave, no nudges allowed
 	bne AllowNudgeNextTime
@@ -56,7 +59,7 @@ DoubleTapUpStart:
 	jmp SetGuideOnP1; jmp OriginalCode
 
 FirstUpTap:
-	move.b #10,$A5(A0) ;move 10 frame timer window for double tap UP
+	move.b #8,$A5(A0) ;move 8 frame timer window for double tap UP
 	move.b #01,$A6(A0) ;flag that says we are pressing UP currently
 	jmp SetGuideOnP1; jmp OriginalCode
 
@@ -71,7 +74,7 @@ SubUpTimer:
 SetGuideOnP1:
 	cmpi.w #$00F0,$413464
 	ble TurnGuideOffP1 ;the timer warning is NOT on, so let's turn off the guide (if need be)
-	ori.b #$80,$41F836 ;now the guide is on
+	ori.b #$80,$41F836 ;the shot timer is above F0, now we will turn the guide is on
 	jmp SetGuideOnP2
 
 TurnGuideOffP1:
@@ -84,6 +87,8 @@ SetGuideOnP2:
 	jmp HoldDownExchangeP1
 
 TurnGuideOffP2:
+	;cmpi.w #$0000,$413564
+	;beq HoldDownExchangeP1
 	andi.b #$7F,$41F837 ;turn off the guide
 
 HoldDownExchangeP1:
