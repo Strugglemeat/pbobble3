@@ -59,7 +59,7 @@ DoubleTapUpStart:
 	jmp SetGuideOnP1; jmp OriginalCode
 
 FirstUpTap:
-	move.b #8,$A5(A0) ;move 8 frame timer window for double tap UP
+	move.b #13,$A5(A0) ;move 13 frame timer window for double tap UP
 	move.b #01,$A6(A0) ;flag that says we are pressing UP currently
 	jmp SetGuideOnP1; jmp OriginalCode
 

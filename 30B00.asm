@@ -6,12 +6,14 @@
 LeftDoubleTapBeginP1:
 	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne LeftDoubleTapBeginP2
-	cmpi.b #04,(-$6AC,A5) ;is P1 non-unified holding LEFT?
+	;cmpi.b #04,(-$6AC,A5) ;is P1 non-unified holding LEFT?
+	cmpi.b #$24,(-$6AC,A5) ;is P1 non-unified holding LEFT & NUDGE? 0x24 is holding left and nudge
 	bne NotHoldingLeft
 	jmp LeftDoubleTapBeginBoth
 
 LeftDoubleTapBeginP2:
-	cmpi.b #04,(-$6A8,A5) ;is P2 non-unified holding LEFT?
+	;cmpi.b #04,(-$6A8,A5) ;is P2 non-unified holding LEFT?
+	cmpi.b #$24,(-$6A8,A5) ;is P2 non-unified holding LEFT & NUDGE?
 	bne NotHoldingLeft
 
 LeftDoubleTapBeginBoth:
@@ -28,7 +30,7 @@ DoLeftDoubleTapMove:
 	jmp OriginalCode
 
 FirstLeftTap:
-	move.b #8,$AF(A0) ;move 8 frame timer window for double tap LEFT
+	move.b #13,$AF(A0) ;move 13 frame timer window for double tap LEFT
 	move.b #01,$B0(A0) ;flag that says we are pressing LEFT currently
 	jmp OriginalCode
 
@@ -43,12 +45,14 @@ SubLeftTimer:
 RightDoubleTapBeginP1:
 	cmpi.b #00,D3 ;00 is P1, FF is P2
 	bne RightDoubleTapBeginP2
-	cmpi.b #08,(-$6AC,A5) ;is P1 non-unified holding RIGHT?
+	;cmpi.b #08,(-$6AC,A5) ;is P1 non-unified holding RIGHT?
+	cmpi.b #$48,(-$6AC,A5) ;is P1 non-unified holding RIGHT & NUDGE?
 	bne NotHoldingRight
 	jmp RightDoubleTapBeginBoth
 
 RightDoubleTapBeginP2:
-	cmpi.b #08,(-$6A8,A5) ;is P2 non-unified holding RIGHT?
+	;cmpi.b #08,(-$6A8,A5) ;is P2 non-unified holding RIGHT?
+	cmpi.b #$48,(-$6A8,A5) ;is P2 non-unified holding RIGHT & NUDGE?
 	bne NotHoldingRight
 
 RightDoubleTapBeginBoth:
@@ -65,7 +69,7 @@ DoRightDoubleTapMove:
 	jmp OriginalCode
 
 FirstRightTap:
-	move.b #8,$B1(A0) ;move 8 frame timer window for double tap RIGHT
+	move.b #13,$B1(A0) ;move 13 frame timer window for double tap RIGHT
 	move.b #01,$B2(A0) ;flag that says we are pressing RIGHT currently
 	jmp OriginalCode
 
